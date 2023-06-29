@@ -12,7 +12,7 @@ d = d/(d.abs().amax(dim=(1,2,3), keepdim=True) + 1e-5)
 idx = torch.randperm(d.shape[0])
 d = d[idx]
 
-ntr, nval = int(d.shape[0]*0.85)
+ntr = int(d.shape[0]*0.85)
 data = Data.TensorDataset(d[:ntr])
 tr = Data.DataLoader(data, batch_size=96, shuffle=True)
 data = Data.TensorDataset(d[ntr:])
