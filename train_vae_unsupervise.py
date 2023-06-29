@@ -1,14 +1,14 @@
 #%%
 from utils import *
 from models import VAE, Loss
-
+os.environ["CUDA_VISIBLE_DEVICES"]="1,2,3"
 torch.autograd.set_detect_anomaly(True)
 
 "both of the aug_neg/pos are the mixture data"
 aug_neg = torch.load('data/aug_neg.pt') # shape of aug_neg is [n,16,8,32,32]
 aug_pos = torch.load('data/aug_pos.pt')  # shape of aug_pos is [n,16,8,32,32]
 d = torch.cat((aug_neg, aug_pos)).reshape(-1, 8, 32, 32)
-d = d/d.amax(dim=(1,2,3), keepdim=True)
+d = d/(d.abs().amax(dim=(1,2,3), keepdim=True) + 1e-5)
 ntr, nval = int(d.shape[0]*0.8), int(d.shape[0]*0.1)
 data = Data.TensorDataset(d[:ntr])
 tr = Data.DataLoader(data, batch_size=96, shuffle=True)
@@ -33,12 +33,13 @@ for epoch in range(200):
         x_hat, mu, logvar, sources = model(x_cuda)
         loss, Recon, KLD = loss_func(x_cuda, x_hat, mu, logvar) #loss = Rec + beta*KLD
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10)
         optimizer.step()
         torch.cuda.empty_cache()
         
         temp.append(loss.cpu().item()/x.shape[0])
     tr_loss.append(sum(temp)/len(temp))
-    
+
     #validation
     model.eval()
     with torch.no_grad():
