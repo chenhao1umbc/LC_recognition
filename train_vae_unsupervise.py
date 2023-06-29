@@ -12,15 +12,11 @@ d = d/(d.abs().amax(dim=(1,2,3), keepdim=True) + 1e-5)
 idx = torch.randperm(d.shape[0])
 d = d[idx]
 
-ntr, nval = int(d.shape[0]*0.8), int(d.shape[0]*0.1)
+ntr, nval = int(d.shape[0]*0.85)
 data = Data.TensorDataset(d[:ntr])
 tr = Data.DataLoader(data, batch_size=96, shuffle=True)
-data = Data.TensorDataset(d[ntr:ntr+nval])
+data = Data.TensorDataset(d[ntr:])
 val = Data.DataLoader(data, batch_size=96)
-data = Data.TensorDataset(d[ntr+nval:])
-te = Data.DataLoader(data, batch_size=96)
-# torch.save(d[ntr:ntr+nval], './data/unsup_val.pt')
-# torch.save(d[ntr+nval:], './data/unsup_test.pt')
 
 model = VAE().cuda()
 model = nn.DataParallel(model)
@@ -29,7 +25,7 @@ loss_func = Loss(sources=2,likelihood='gauss')
 
 #%%
 tr_loss, val_loss = [], []
-for epoch in range(200):
+for epoch in range(201):
     model.train()
     temp = []
     for i, (x,) in enumerate(tr):
@@ -56,14 +52,22 @@ for epoch in range(200):
             temp.append(loss.cpu().item()/x.shape[0])
         val_loss.append(sum(temp)/len(temp))
 
-    if epoch%5 == 0:
+    if epoch%20 == 0 and epoch > 50:
         print(epoch)
         plt.figure()
         plt.plot(tr_loss, '-o')
         plt.plot(val_loss, '--^')
         plt.legend(['Training', 'Validation'])
         plt.title(f'Loss fuction at epoch {epoch}')
-        plt.show()
         plt.savefig('./res/LossFun.png')
 
+        plt.figure()
+        plt.plot(tr_loss[-50:], '-o')
+        plt.plot(val_loss[-50:], '--^')
+        plt.legend(['Training', 'Validation'])
+        plt.title(f'Last 50 loss function values at {epoch}')
+        plt.savefig(f'./res/Last_50 at {epoch}.png')
+        plt.close('all')
+
+        torch.save([tr_loss, val_loss], './res/tr_val_loss.pt')
         torch.save(model, f'./res/model_epoch{epoch}.pt')
