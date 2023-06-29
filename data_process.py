@@ -52,6 +52,7 @@ ind = torch.randperm(neg_all.shape[0])
 neg_shuffle, pos_shuffle = neg_all[ind], pos_all[ind]
 pos, neg = neg_shuffle[:n_tr_val], pos_shuffle[:n_tr_val]
 torch.save( [neg_shuffle[n_tr_val:], pos_shuffle[n_tr_val:]], './data/test_neg_pos.pt' )
+torch.save( [neg_shuffle[:n_tr_val], pos_shuffle[:n_tr_val]], './data/tr_val_neg_pos.pt' )
 
 #%% Get the augmented positive
 core = pos[:,12:20, 16:48, 16:48] # must contains tumor
