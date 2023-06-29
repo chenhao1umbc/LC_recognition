@@ -51,7 +51,7 @@ for epoch in range(200):
         print(epoch)
         plt.figure()
         plt.plot(tr_loss, '-o')
-        plt.plot(val_loss, '--')
+        plt.plot(val_loss, '--^')
         plt.legend(['Training', 'Validation'])
         plt.title(f'Loss fuction at epoch {epoch}')
         plt.savefig('./res/LossFun.png')
