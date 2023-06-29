@@ -9,6 +9,9 @@ aug_neg = torch.load('data/aug_neg.pt') # shape of aug_neg is [n,16,8,32,32]
 aug_pos = torch.load('data/aug_pos.pt')  # shape of aug_pos is [n,16,8,32,32]
 d = torch.cat((aug_neg, aug_pos)).reshape(-1, 8, 32, 32)
 d = d/(d.abs().amax(dim=(1,2,3), keepdim=True) + 1e-5)
+idx = torch.randperm(d.shape[0])
+d = d[idx]
+
 ntr, nval = int(d.shape[0]*0.8), int(d.shape[0]*0.1)
 data = Data.TensorDataset(d[:ntr])
 tr = Data.DataLoader(data, batch_size=96, shuffle=True)
