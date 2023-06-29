@@ -5,7 +5,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="1,2,3"
 torch.autograd.set_detect_anomaly(True)
 
 "both of the aug_neg/pos are the mixture data"
-aug_neg = torch.load('data/aug_neg.pt') # shape of aug_neg is [n,16,8,32,32]
+aug_neg = torch.load('data/aug_neg+core.pt') # shape of aug_neg is [n,16,8,32,32]
 aug_pos = torch.load('data/aug_pos.pt')  # shape of aug_pos is [n,16,8,32,32]
 d = torch.cat((aug_neg, aug_pos)).reshape(-1, 8, 32, 32)
 d = d/(d.abs().amax(dim=(1,2,3), keepdim=True) + 1e-5)
@@ -19,6 +19,8 @@ data = Data.TensorDataset(d[ntr:ntr+nval])
 val = Data.DataLoader(data, batch_size=96)
 data = Data.TensorDataset(d[ntr+nval:])
 te = Data.DataLoader(data, batch_size=96)
+# torch.save(d[ntr:ntr+nval], './data/unsup_val.pt')
+# torch.save(d[ntr+nval:], './data/unsup_test.pt')
 
 model = VAE().cuda()
 model = nn.DataParallel(model)

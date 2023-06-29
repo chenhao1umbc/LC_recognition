@@ -72,11 +72,40 @@ if view_data:
 
     plt.tight_layout()  # Adjust the layout to prevent overlapping
     plt.show()
-# torch.save(aug_pos, 'aug_pos.pt')
+torch.save(aug_pos, 'aug_pos.pt')
 
 #%%  Get the augmented negative (still as positive)
 tokens = my_chuck(my_chuck(my_chuck(neg,2,-1), 2,-2), 4, -3).reshape(neg.shape[0],-1,8,32,32)
-aug_neg = tokens + core[:,None]
+aug_neg_core = tokens + core[:,None]
+
+view_data = False
+if view_data:
+    fig, axs = plt.subplots(4, 2, figsize=(12, 6))
+    axs = axs.ravel()
+    for i, image in enumerate(tokens[20,0]):
+    # for i, image in enumerate(tokens[100,0]):
+        axs[i].axis('off')
+        axs[i].imshow(image)
+        axs[i].set_title(f'Slice {i+1}')  # Set a title for each image (optional)
+
+    plt.tight_layout()  # Adjust the layout to prevent overlapping
+    plt.show()
+
+
+    fig, axs = plt.subplots(4, 2, figsize=(12, 6))
+    axs = axs.ravel()
+    for i, image in enumerate(aug_neg[20,0]):
+    # for i, image in enumerate(tokens[100,0]):
+        axs[i].axis('off')
+        axs[i].imshow(image)
+        axs[i].set_title(f'Slice {i+1}')  # Set a title for each image (optional)
+
+    plt.tight_layout()  # Adjust the layout to prevent overlapping
+    plt.show()
+torch.save(aug_neg_core, 'aug_neg+core.pt')
+
+#%%  Get the augmented negative (still as positive)
+aug_neg = my_chuck(my_chuck(my_chuck(neg,2,-1), 2,-2), 4, -3).reshape(neg.shape[0],-1,8,32,32)
 
 view_data = False
 if view_data:
