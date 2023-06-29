@@ -41,7 +41,8 @@ for epoch in range(200):
     with torch.no_grad():
         temp = []
         for i, (x,) in enumerate(val):
-            x_hat, mu, logvar, sources = model(x.cuda())
+            x_cuda = x.cuda()
+            x_hat, mu, logvar, sources = model(x_cuda)
             loss, Recon, KLD = loss_func(x_cuda, x_hat, mu, logvar)
             temp.append(loss.cpu().item()/x.shape[0])
         val_loss.append(sum(temp)/len(temp))
