@@ -2,11 +2,13 @@
 from utils import *
 from models import VAE, Loss
 
+torch.autograd.set_detect_anomaly(True)
+
 "both of the aug_neg/pos are the mixture data"
 aug_neg = torch.load('data/aug_neg.pt') # shape of aug_neg is [n,16,8,32,32]
 aug_pos = torch.load('data/aug_pos.pt')  # shape of aug_pos is [n,16,8,32,32]
-
 d = torch.cat((aug_neg, aug_pos)).reshape(-1, 8, 32, 32)
+d = d/d.amax(dim=(1,2,3), keepdim=True)
 ntr, nval = int(d.shape[0]*0.8), int(d.shape[0]*0.1)
 data = Data.TensorDataset(d[:ntr])
 tr = Data.DataLoader(data, batch_size=96, shuffle=True)
@@ -16,6 +18,7 @@ data = Data.TensorDataset(d[ntr+nval:])
 te = Data.DataLoader(data, batch_size=96)
 
 model = VAE().cuda()
+model = nn.DataParallel(model)
 optimizer = torch.optim.RAdam(model.parameters(), lr=1e-4)
 loss_func = Loss(sources=2,likelihood='gauss')
 
@@ -54,6 +57,7 @@ for epoch in range(200):
         plt.plot(val_loss, '--^')
         plt.legend(['Training', 'Validation'])
         plt.title(f'Loss fuction at epoch {epoch}')
+        plt.show()
         plt.savefig('./res/LossFun.png')
 
-        torch.save(model, './res/model_epoch{epoch}.pt')
+        torch.save(model, f'./res/model_epoch{epoch}.pt')
