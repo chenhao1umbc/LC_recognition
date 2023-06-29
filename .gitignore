@@ -131,6 +131,7 @@ dmypy.json
 
 # data folder
 data/
+res/
 
 #others
 *.out
