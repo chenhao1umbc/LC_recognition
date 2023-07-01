@@ -75,10 +75,32 @@ def pca(x):
 K = 500
 un, s2n = pca(dn)
 up, s2p = pca(dp) # check how many dim to choose by s2q
-proj_n = un[:, :K].t()
-mean_n = dn.mean(1, keepdim=True)
-proj_p = up[:, :K].t()
-mean_p = dp.mean(1, keepdim=True)
-
+proj_n = un[:, :K].t()[None, None]
+mean_n = dn.mean(1)
+proj_p = up[:, :K].t()[None, None]
+mean_p = dp.mean(1)
 
 test_neg_tokens, test_pos_tokens = tokenize(test_neg), tokenize(test_pos) #[n, 16, 8, 32, 32]
+tnt = test_neg_tokens.reshape(982, 16, -1, 1)
+tpt = test_pos_tokens.reshape(982, 16, -1, 1)
+
+res1 = (proj_n @ (tnt - mean_n)).squeeze() #[n, 16, K]
+res2 = (proj_p @ (tnt - mean_p)).squeeze()
+
+"""theoretically one positive in the token is postive
+but then the false alarm rate will be too high.
+So a threshold is needed
+"""
+thre = 5
+res = res1>res2
+acc_n = (res.sum(1) <= thre).sum()
+
+
+res1 = (proj_n @ (tpt - mean_n)).squeeze() #[n, 16, K]
+res2 = (proj_p @ (tpt - mean_p)).squeeze() 
+res = res2>res1
+acc_p = (res.sum(1) >= 11).sum()
+
+acc = (acc_n + acc_p)/(test_neg.shape[0]*2) 
+print(f'acc is {acc.item()}')
+
