@@ -11,6 +11,7 @@ import torch.nn.functional as Func
 import torch.utils.data as Data
 from datetime import datetime
 import torchvision.datasets as datasets 
+torch.set_printoptions(linewidth=120)
 Tensor = torch.Tensor
 
 # from torch.utils.tensorboard import SummaryWriter

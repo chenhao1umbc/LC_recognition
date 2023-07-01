@@ -21,7 +21,7 @@ val = Data.DataLoader(data, batch_size=96)
 model = VAE().cuda()
 model = nn.DataParallel(model)
 optimizer = torch.optim.RAdam(model.parameters(), lr=1e-4)
-loss_func = Loss(sources=2,likelihood='gauss')
+loss_func = Loss(sources=2,likelihood='gauss') #guass, laplace, other
 
 #%%
 tr_loss, val_loss = [], []
