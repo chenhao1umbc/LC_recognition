@@ -4,9 +4,6 @@ from utils import *
 os.environ["CUDA_VISIBLE_DEVICES"]="2"
 from models import VAE, MLP
 
-# TODO train with raw data
-
-
 #%% train with aug data
 tr_pos = torch.load('./data/aug_pos.pt') # data is not normalized
 tr_neg = torch.load('./data/aug_neg.pt')
@@ -28,6 +25,8 @@ data = Data.TensorDataset(d_val, l_val)
 val = Data.DataLoader(data, batch_size=64, shuffle=False)
 
 vae = VAE().cuda()
+temp = torch.load('./res/vae_unsupervised/model_epoch200.pt')
+vae.load_state_dict(temp.module.state_dict())
 mlp = MLP().cuda()
 opt1 = torch.optim.RAdam(vae.parameters(), lr=1e-4)
 opt2 = torch.optim.RAdam(mlp.parameters(), lr=1e-4)

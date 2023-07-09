@@ -1,7 +1,7 @@
 #%%
 from utils import *
 # torch.autograd.set_detect_anomaly(True)
-os.environ["CUDA_VISIBLE_DEVICES"]="1"
+os.environ["CUDA_VISIBLE_DEVICES"]="3"
 
 #%% test on raw data
 "process data"
@@ -29,7 +29,7 @@ with torch.no_grad():
         counter = ((y_hat.argmax(dim=-1)- y_cuda) == 0).sum()
         acc.append(counter)
 acc_test = sum(acc)/d_test.shape[0]
-print('test acc is ', acc_test) # 0.7241
+print('test acc is ', acc_test) # 0.6897
 
 
 #%% test on augmented data

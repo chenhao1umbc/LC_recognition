@@ -1,6 +1,6 @@
 #%%
 from utils import *
-from models import VAE, Loss
+from models import VAE2, Loss
 os.environ["CUDA_VISIBLE_DEVICES"]="1,2,3"
 torch.autograd.set_detect_anomaly(True)
 
@@ -18,7 +18,7 @@ tr = Data.DataLoader(data, batch_size=96, shuffle=True)
 data = Data.TensorDataset(d[ntr:])
 val = Data.DataLoader(data, batch_size=96)
 
-model = VAE().cuda()
+model = VAE2().cuda()
 model = nn.DataParallel(model)
 optimizer = torch.optim.RAdam(model.parameters(), lr=1e-4)
 loss_func = Loss(sources=2,likelihood='laplace') #guass, laplace, other
@@ -59,15 +59,15 @@ for epoch in range(201):
         plt.plot(val_loss, '--^')
         plt.legend(['Training', 'Validation'])
         plt.title(f'Loss fuction at epoch {epoch}')
-        plt.savefig('./res/LossFun_lap.png')
+        plt.savefig('./res/LossFun_lap_2.png')
 
         plt.figure()
         plt.plot(tr_loss[-50:], '-o')
         plt.plot(val_loss[-50:], '--^')
         plt.legend(['Training', 'Validation'])
-        plt.title(f'Last 50 loss function values at {epoch}')
-        plt.savefig(f'./res/Last_50 at {epoch}_lap.png')
+        plt.title(f'Last 50 loss function values at {epoch}_2')
+        plt.savefig(f'./res/Last_50 at {epoch}_lap_2.png')
         plt.close('all')
 
-        torch.save([tr_loss, val_loss], './res/tr_val_loss_lap.pt')
-        torch.save(model, f'./res/model_epoch{epoch}_lap.pt')
+        torch.save([tr_loss, val_loss], './res/tr_val_loss_lap_2.pt')
+        torch.save(model, f'./res/model_epoch{epoch}_lap_2.pt')
