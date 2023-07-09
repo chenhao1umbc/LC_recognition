@@ -98,7 +98,7 @@ acc_n = (res.sum(1) <= thre).sum()
 res1 = (proj_n @ (tpt - mean_n)).squeeze().norm(dim=-1) #[n, 16, K]
 res2 = (proj_p @ (tpt - mean_p)).squeeze().norm(dim=-1)
 res = res2>res1
-acc_p = (res.sum(1) >= 11).sum()
+acc_p = (res.sum(1) >= thre).sum()
 
 acc = (acc_n + acc_p)/(test_neg.shape[0]*2) 
 print(f'acc is {acc.item()}') #0.9224
