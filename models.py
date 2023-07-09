@@ -159,3 +159,17 @@ class Loss(nn.Module):
         
         loss = ELL + beta*KLD
         return loss, ELL,  KLD
+
+class MLP(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.mlp = nn.Sequential(
+            nn.Linear(128, 128),
+            nn.LeakyReLU(True),
+            nn.Linear(128, 64),
+            nn.LeakyReLU(True),
+            nn.Linear(64, 2)        
+        )
+
+    def forward(self, x):
+        return self.mlp(x)
