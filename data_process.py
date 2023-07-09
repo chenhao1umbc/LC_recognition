@@ -50,14 +50,14 @@ torch.manual_seed(1)
 n_tr_val = int(neg_all.shape[0]*0.85)
 ind = torch.randperm(neg_all.shape[0])
 neg_shuffle, pos_shuffle = neg_all[ind], pos_all[ind]
-pos, neg = neg_shuffle[:n_tr_val], pos_shuffle[:n_tr_val]
+neg, pos = neg_shuffle[:n_tr_val], pos_shuffle[:n_tr_val]
 torch.save( [neg_shuffle[n_tr_val:], pos_shuffle[n_tr_val:]], './data/test_neg_pos.pt' )
 torch.save( [neg_shuffle[:n_tr_val], pos_shuffle[:n_tr_val]], './data/tr_val_neg_pos.pt' )
 
 #%% Get the augmented positive
-core = pos[:,12:20, 16:48, 16:48] # must contains tumor
+pcore = pos[:,12:20, 16:48, 16:48] # must contains tumor
 tokens = my_chuck(my_chuck(my_chuck(pos,2,-1), 2,-2), 4, -3).reshape(pos.shape[0],-1,8,32,32)
-aug_pos = tokens + core[:,None]
+aug_pos = tokens + pcore[:,None]
 
 view_data = False
 if view_data:
@@ -86,7 +86,7 @@ torch.save(aug_pos, './data/aug_pos.pt')
 
 #%%  Get the augmented negative (still as positive)
 tokens = my_chuck(my_chuck(my_chuck(neg,2,-1), 2,-2), 4, -3).reshape(neg.shape[0],-1,8,32,32)
-aug_neg_core = tokens + core[:,None]
+aug_neg_core = tokens + pcore[:,None]
 
 view_data = False
 if view_data:
@@ -112,10 +112,13 @@ if view_data:
 
     plt.tight_layout()  # Adjust the layout to prevent overlapping
     plt.show()
-torch.save(aug_neg_core, './data/aug_neg+core.pt')
+torch.save(aug_neg_core, './data/aug_neg+pcore.pt')
 
 #%%  Get the augmented negative (still as positive)
+ncore = pos[:,12:20, 16:48, 16:48] 
 aug_neg = my_chuck(my_chuck(my_chuck(neg,2,-1), 2,-2), 4, -3).reshape(neg.shape[0],-1,8,32,32)
+aug_neg = aug_neg + ncore[:,None]
+
 
 view_data = False
 if view_data:
