@@ -15,8 +15,10 @@ l_test = torch.cat((torch.zeros(n_test), torch.ones(n_test)))
 data = Data.TensorDataset(d_test, l_test)
 te = Data.DataLoader(data, batch_size=64, shuffle=False)
 
-model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=False)
-model = torch.load('./res/resnet/best_resnet_pre.pt')
+from torchvision.models import vit_b_32
+model = vit_b_32(image_size=32)
+model.conv_proj = nn.Conv2d(8, 768, kernel_size=(32, 32), stride=(32, 32))
+model = torch.load('./res/vit/best_vit.pt')
 
 model.eval()
 with torch.no_grad():
@@ -56,9 +58,10 @@ l_test = torch.cat((torch.zeros(n_test), torch.ones(n_test)))
 data = Data.TensorDataset(d_test, l_test)
 te = Data.DataLoader(data, batch_size=64, shuffle=False)
 
-model = torch.hub.load('pytorch/vision:v0.10.0', 'resnet18', pretrained=False)
-model.conv1 = nn.Conv2d(8, 64, kernel_size=3, stride=1, padding=1, bias=False)
-model = torch.load('./res/resnet/best_resnet_aug.pt')
+from torchvision.models import vit_b_32
+model = vit_b_32(image_size=32)
+model.conv_proj = nn.Conv2d(8, 768, kernel_size=(32, 32), stride=(32, 32))
+model = torch.load('./res/vit/best_vit_aug.pt')
 
 threshold = 8
 model.eval()
@@ -73,7 +76,8 @@ with torch.no_grad():
         l_hat[l_hat>threshold] = 1
         counter = ((l_hat- y_cuda) == 0).sum()
         acc.append(counter)
-        print(y_hat.argmax(dim=-1))
+        print(y_hat.argmax(dim=-1).sum(dim=-1).sort())
+        print()
 
 acc_test = sum(acc)/d_test.shape[0]
 print('test acc is ', acc_test) 

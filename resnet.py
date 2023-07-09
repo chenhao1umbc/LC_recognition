@@ -1,6 +1,7 @@
 #%%
 from utils import *
 # torch.autograd.set_detect_anomaly(True)
+os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
 #%% using the aug data with 2d conv, without pretrained
 "process data"
