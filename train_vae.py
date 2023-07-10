@@ -93,5 +93,5 @@ for epoch in range(201):
         plt.savefig(f'./res/vae/Last_50 at {epoch}_aug.png')
         plt.close('all')
 
-        torch.save([tr_loss, val_loss], './res/tr_val_loss_aug.pt')
+        torch.save([tr_loss, val_loss], './res/vae/tr_val_loss_aug.pt')
         torch.save((vae, mlp), f'./res/vae/model_epoch{epoch}_aug.pt')
