@@ -5,10 +5,28 @@ from torchvision.models import vit_b_32
 
 #%% using the aug data with 2d conv, without pretrained
 "process data"
-tr_pos = torch.load('./data/aug_pos.pt') # data is not normalized
-tr_neg = torch.load('./data/aug_neg.pt')
-tr_neg = tr_neg/(tr_neg.abs().amax(dim=(1,2,3,4), keepdim=True) + 1e-5)
-tr_pos = tr_pos/(tr_pos.abs().amax(dim=(1,2,3,4), keepdim=True) + 1e-5)
+test_neg, test_pos = torch.load('./data/tr_val_neg_pos.pt') # data is not normalized
+def tokenize(x):
+    """
+    x has the shape of [n, 32, 64, 64]
+    """
+    def my_chuck(x, chunks=2, dim=0):
+        return torch.stack(torch.chunk(x,chunks,dim), dim=1)
+    
+    tokens = my_chuck(my_chuck(my_chuck(x,2,-1), 2,-2), 4, -3).reshape(x.shape[0],-1,8,32,32)
+    return tokens
+
+test_neg_tokens, test_pos_tokens = tokenize(test_neg), tokenize(test_pos) #[n, 16, 8, 32, 32]
+core_neg = test_neg[:,12:20, 16:48, 16:48]
+core_pos = test_pos[:,12:20, 16:48, 16:48]
+test_neg_tokens = test_neg_tokens + core_neg[:,None]
+test_pos_tokens = test_pos_tokens + core_pos[:,None]
+tr_neg = test_neg_tokens/(test_neg_tokens.abs().amax(dim=(1,2,3,4), keepdim=True) + 1e-5)
+tr_pos = test_pos_tokens/(test_pos_tokens.abs().amax(dim=(1,2,3,4), keepdim=True) + 1e-5)
+# tr_pos = torch.load('./data/aug_pos.pt') # data is not normalized
+# tr_neg = torch.load('./data/aug_neg.pt')
+# tr_neg = tr_neg/(tr_neg.abs().amax(dim=(1,2,3,4), keepdim=True) + 1e-5)
+# tr_pos = tr_pos/(tr_pos.abs().amax(dim=(1,2,3,4), keepdim=True) + 1e-5)
 
 n_tr = int(tr_neg.shape[0]*0.85)
 d_tr = torch.cat((tr_neg[:n_tr], tr_pos[:n_tr]))
@@ -64,21 +82,21 @@ for epoch in range(201):
         acc_all.append(sum(acc)/d_val.shape[0])
     print(f'acc at epoch {epoch}:', acc_all[-1])
     if acc_all[-1] == max(acc_all):
-        torch.save(model, './res/vit/best_vit_aug2.pt')
+        torch.save(model, './res/vit/best_vit_aug2_new.pt')
 
     if epoch > 50 and epoch%20 == 0:
         plt.plot(tr_loss[-50:], '-o')
         plt.plot(val_loss[-50:], '--^')
         plt.legend(['Training', 'Validation'])
-        plt.savefig(f'./res/vit/vit_loss_{epoch}_aug2.png')
+        plt.savefig(f'./res/vit/vit_loss_{epoch}_aug2_new.png')
         plt.close('all')
 
-torch.save([tr_loss, val_loss], './res/vit/vit_tr_val_loss_aug2.pt')
-torch.save(acc_all, './res/vit/val_acc_aug2.pt')
+torch.save([tr_loss, val_loss], './res/vit/vit_tr_val_loss_aug2_new.pt')
+torch.save(acc_all, './res/vit/val_acc_aug2_new.pt')
 plt.figure()
 plt.plot(tr_loss, '-o')
 plt.plot(val_loss, '--^')
 plt.legend(['Training', 'Validation'])
-plt.savefig('./res/vit/vit_loss_func_values_aug2.png')
+plt.savefig('./res/vit/vit_loss_func_values_aug2_new.png')
 plt.close('all')
 print('done')
