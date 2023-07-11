@@ -51,7 +51,7 @@ for epoch in range(201):
     with torch.no_grad():
         temp, acc = [], []
         for i, (x, y) in enumerate(val):
-            x_cuda, y_cuda = x[:None].cuda(), y.cuda()
+            x_cuda, y_cuda = x[:,None].cuda(), y.cuda()
             y_hat = model(x_cuda).squeeze()
             loss = loss_func(y_hat, y_cuda)
             temp.append(loss.cpu().item()/x.shape[0])
