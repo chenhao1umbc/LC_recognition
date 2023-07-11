@@ -227,10 +227,77 @@ class MLP(nn.Module):
         self.mlp = nn.Sequential(
             nn.Linear(128, 128),
             nn.LeakyReLU(True),
+            nn.BatchNorm1d(128),
             nn.Linear(128, 64),
             nn.LeakyReLU(True),
+            nn.BatchNorm1d(64),
             nn.Linear(64, 2)        
         )
 
     def forward(self, x):
         return self.mlp(x)
+    
+
+class Model3d(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.block = nn.Sequential(
+            nn.Conv3d(1, 32, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(32),
+            nn.Conv3d(32, 32, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(32),
+            nn.MaxPool3d(2),
+
+            nn.Conv3d(32, 64, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(64),
+            nn.Conv3d(64, 64, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(64),
+            nn.MaxPool3d(2),
+
+            nn.Conv3d(64, 128, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(128),
+            nn.Conv3d(128, 128, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(128),
+            nn.MaxPool3d(2),
+
+            nn.Conv3d(128, 256, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(256),
+            nn.Conv3d(256, 256, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(256),
+            nn.MaxPool3d(2),
+
+            nn.Conv3d(256, 512, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(512),
+            nn.Conv3d(512, 512, 3, 1, 1),
+            nn.ReLU(True),
+            nn.BatchNorm3d(512),
+            nn.MaxPool3d(2),
+        )
+
+        self.mlp = nn.Sequential(
+            nn.Linear(2048, 1024),
+            nn.ReLU(True),
+            nn.BatchNorm1d(1024),
+            nn.Dropout(0.3),
+
+            nn.Linear(1024, 64),
+            nn.ReLU(True),
+            nn.BatchNorm1d(1024),
+            nn.Dropout(0.3),
+            nn.Linear(64, 1),
+            nn.Sigmoid()
+        )
+    def forward(self, x):
+        x = self.block(x)
+        x = self.mlp(x.reshape(x.shape[0], -1))
+        return x
+
