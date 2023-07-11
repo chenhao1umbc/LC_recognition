@@ -291,7 +291,7 @@ class Model3d(nn.Module):
 
             nn.Linear(1024, 64),
             nn.ReLU(True),
-            nn.BatchNorm1d(1024),
+            nn.BatchNorm1d(64),
             nn.Dropout(0.3),
             nn.Linear(64, 1),
             nn.Sigmoid()
