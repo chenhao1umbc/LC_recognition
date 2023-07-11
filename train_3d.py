@@ -37,7 +37,7 @@ for epoch in range(201):
         optimizer.zero_grad()
         x_cuda, y_cuda = x[:,None].cuda(), y.cuda()
         y_hat = model(x_cuda).squeeze()
-        loss = loss_func(y_hat, y_cuda.to(torch.long)) #loss = Rec + beta*KLD
+        loss = loss_func(y_hat, y_cuda) #loss = Rec + beta*KLD
         loss.backward()
         torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10)
         optimizer.step()
@@ -53,7 +53,7 @@ for epoch in range(201):
         for i, (x, y) in enumerate(val):
             x_cuda, y_cuda = x[:None].cuda(), y.cuda()
             y_hat = model(x_cuda).squeeze()
-            loss = loss_func(y_hat, y_cuda.to(torch.long))
+            loss = loss_func(y_hat, y_cuda)
             temp.append(loss.cpu().item()/x.shape[0])
             counter = ((y_hat.argmax(dim=-1)- y_cuda) == 0).sum()
             acc.append(counter)
