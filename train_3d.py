@@ -55,7 +55,9 @@ for epoch in range(201):
             y_hat = model(x_cuda).squeeze()
             loss = loss_func(y_hat, y_cuda)
             temp.append(loss.cpu().item()/x.shape[0])
-            counter = ((y_hat.argmax(dim=-1)- y_cuda) == 0).sum()
+            y_hat[y_hat>0.5] = 1
+            y_hat[y_hat<=0.5] = 0
+            counter = ((y_hat- y_cuda) == 0).sum()
             acc.append(counter)
 
         val_loss.append(sum(temp)/len(temp))
