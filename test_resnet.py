@@ -118,4 +118,4 @@ with torch.no_grad():
         acc.append(counter)
 
 acc_test = sum(acc)/d_test.shape[0]
-print('test acc is ', acc_test) 
+print('test acc is ', acc_test) #0.7586
