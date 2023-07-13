@@ -1,0 +1,19 @@
+train_3d, test_3d -- using raw data
+
+resnet: *, *_pre, *_aug,  *_aug2, *_aug2_new 
+    -- * means random init using raw data
+        *_pre means pretrained weights using raw data
+        *_aug means random init using aug data
+        *_aug2 means random init using aug data but labeling not using threshold
+        *_aug2_new means random init using aug data but from tr_val_neg_pos directly.
+
+vae: rand/, *_aug, *_aug50, *_aug50_lap, *_aug50_new, *_aug50_new2
+    -- rand/ folder contains using rand init with aug data
+    *_aug means using unsuppervised init with aug data
+    *_aug50 means using unsuppervised init with aug data but first 50 epoch did not update vae, just update mlp
+    *_aug50 means using unsuppervised laplasian init with aug data but first 50 epoch did not update vae, just update mlp
+    *_aug50_new means similar to *_aug50 using aug data but from tr_val_neg_pos directly
+    *_aug50_new2 means similar to *_aug50_new, but using VAE2, the larger vae
+
+vit: *, *_aug, *_aug2, *_aug2_new
+    -- the same as resnet
